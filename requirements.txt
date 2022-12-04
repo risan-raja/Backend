@@ -1,0 +1,7 @@
+celery~=5.2.7
+Flask~=2.2.2
+Werkzeug~=2.2.2
+SQLAlchemy~=1.4.44
+zxcvbn~=4.4.28
+
+WTForms~=3.0.1

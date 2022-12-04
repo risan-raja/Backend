@@ -1,0 +1,8 @@
+{
+    "editor.bracketPairColorization.independentColorPoolPerBracketType": true,
+    "editor.smoothScrolling": true,
+    "workbench.startupEditor": "none",
+    "diffEditor.codeLens": true,
+    "explorer.fileNesting.enabled": true,
+    "terminal.integrated.tabs.defaultColor": "terminal.ansiBlue"
+}

@@ -1,0 +1,6 @@
+*/__pycache__/*
+__pycache__/*
+/config/*
+/instance/*
+/sentry_setup.sh
+/config/
