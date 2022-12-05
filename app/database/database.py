@@ -11,10 +11,10 @@ db_engine = create_engine(
         echo=Config.SQLALCHEMY_ENGINE_ECHO
     )
 # create empty session for future usage
-db_session = scoped_session(sessionmaker(autocommit=True, autoflush=False))
+db_session = scoped_session(sessionmaker(autocommit=False, autoflush=False))
 
 # user_datastore = SQLAlchemySessionUserDatastore(db_session, User, Role)
-db = SQLAlchemy(session_options={"autocommit": True,"autoflush": False},
+db = SQLAlchemy(session_options={"autocommit": False,"autoflush": False},
                 model_class=Base,
                 query_class=BaseQuery,)
 

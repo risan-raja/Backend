@@ -1,4 +1,6 @@
 from sqlalchemy.types import CHAR, TypeDecorator
+import uuid
+from sqlalchemy.dialects.postgresql import UUID
 
 from .database import db
 

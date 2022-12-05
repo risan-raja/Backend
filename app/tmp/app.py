@@ -4,7 +4,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 
 from app.database.database import init_db
 from app.ext.cache import cache
-from app.ext.celery import celery
+from app.ext.background_services import celery
 from app.ext.sentry import init_sentry
 
 
