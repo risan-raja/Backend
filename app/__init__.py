@@ -17,10 +17,10 @@ from app.ext.security import security, user_datastore, ExtendedRegisterForm, MyM
 def create_app():
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_object("config.Config")
-    ProxyFix(app,x_for=1,x_host=1,)
+    # ProxyFix(app,x_for=1,x_host=1,)
     init_db(app)
     mail.init_app(app)
-    cors.init_app(app, resources={r'/*': {'origins': ['0.0.0.0','localhost','192.168.29.74','192.168.29.65']}})
+    cors.init_app(app, resources={r'/*': {'origins': '*'}, r'/api/*': {'origins': '*'}})
     # init_sentry(app)
     cache.init_app(app)
     # DebugToolbarExtension(app)
