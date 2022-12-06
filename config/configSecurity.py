@@ -43,9 +43,9 @@ class configSecurity(object):
     enforce CSRF protection for session / browser - but allow token-based
     API calls to go through
     """
-    SECURITY_CSRF_PROTECT_MECHANISMS = ["session", "basic"]
+    SECURITY_CSRF_PROTECT_MECHANISMS = ["basic"]
     SECURITY_CSRF_IGNORE_UNAUTH_ENDPOINTS = True
-
+    # WTF_CSRF_HEADERS = ["X-CSRF-Token"],
     # Send Cookie with csrf-token. This is the default for Axios and Angular.
     SECURITY_CSRF_COOKIE_NAME = "XSRF-TOKEN"
     WTF_CSRF_CHECK_DEFAULT = False
