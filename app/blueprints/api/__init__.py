@@ -37,10 +37,10 @@ user_model = api.model('User', {
 })
 
 
-
 @api.route('/user')
-class user_info(Resource):
+class UserInfo(Resource):
     @login_required
+    @auth_token_required
     @api.marshal_with(user_model)
     def post(self):
         user = current_user

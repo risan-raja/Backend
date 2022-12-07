@@ -1,6 +1,8 @@
 from app.database import GUID, db
 from . import Base
 import uuid
+
+
 class Task(Base):
     id = db.Column(GUID, primary_key=True, default=uuid.uuid4)
     title = db.Column(db.String(80), unique=True, nullable=False)
