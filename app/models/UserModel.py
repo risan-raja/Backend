@@ -33,21 +33,24 @@ class User(Base, UserMixin):
     login_count = db.Column(db.Integer)
     active = db.Column(db.Boolean, default=True)
     fs_uniquifier = db.Column(db.String(255), unique=True, nullable=False)
-    roles = db.relationship('Role', secondary='roles_users',
+    roles = db.relationship('Role',
+                            secondary='roles_users',
                             backref=db.backref('user', lazy='dynamic'))
     task_lists = db.relationship('TaskList', backref='user', lazy=True)
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime,
+                           nullable=False,
+                           default=datetime.utcnow)
     current_login_ip = db.Column(db.String(100))
     last_login_ip = db.Column(db.String(100))
     confirmed_at = db.Column(db.DateTime())
 
     # dob = db.Column(db.DateTime, nullable=True)
 
-    def get_security_payload(self) -> dict[str, str]:
+    def get_security_payload(self):
         return {
-                'email':        self.email,
-                'first_name':   self.first_name,
-                'last_name':    self.last_name,
-                'active':       self.active,
-                'confirmed_at': self.confirmed_at,
+            'email': self.email,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'active': self.active,
+            'confirmed_at': self.confirmed_at,
         }

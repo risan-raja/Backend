@@ -5,7 +5,7 @@ from config import Config
 
 mail = Mail()
 celery = Celery(__name__, broker=Config.CELERY_BROKER_URL,
-                backend=Config.CELERY_RESULT_BACKEND,
+                backend=Config.CELERY_RESULT_BACKEND
                 )
 
 

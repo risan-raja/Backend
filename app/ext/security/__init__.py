@@ -2,7 +2,8 @@ from flask_security import MailUtil, RegisterForm
 from flask_security import SQLAlchemyUserDatastore, Security
 from wtforms import StringField
 from wtforms.validators import DataRequired, Optional
-
+from flask import current_app
+from flask_mailman import EmailMultiAlternatives, Mail
 from app.database.database import db
 from app.ext.background_services import celery
 from app.models import Role, User
@@ -12,14 +13,14 @@ user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 
 
 class ExtendedRegisterForm(RegisterForm):
-    first_name = StringField('First Name', [DataRequired()])
+    first_name = StringField('First Name', [DataRequired(message="Invalid First Name : Please provide a valid First Name")])
     last_name = StringField('Last Name', [Optional()])
 
 
 @celery.task(name='security.send_email')
 def send_flask_mail(**kwargs):
     with current_app.app_context():
-        with app.extensions['mailman'].get_connection() as connection:
+        with current_app.extensions['mailman'].get_connection() as connection:
             html = kwargs.pop("html", None)
             msg = EmailMultiAlternatives(**kwargs, connection=connection)
             if html:
@@ -40,3 +41,4 @@ class MyMailUtil(MailUtil):
 
 
 security = Security()
+
