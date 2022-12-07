@@ -2,6 +2,7 @@ from flask import Blueprint
 from flask_restx import Api, Resource
 from flask_restx import fields
 from flask_security import auth_token_required, current_user, login_required
+from app.models import TaskList, Task
 
 """
 ## USER DATA MODEL
@@ -35,6 +36,21 @@ user_model = api.model('User', {
         'current_login_ip': fields.String(required=True, description='The current login IP'),
         'confirmed_at':     fields.DateTime(required=True, description='The user confirmation date'),
 })
+task_list_model = api.model('TaskList', {
+        'title':      fields.String(required=True, description='The task list title'),
+        'created_at': fields.DateTime(required=True, description='The task list creation date'),
+        'updated_at': fields.DateTime(required=True, description='The task list update date'),
+        'description':  fields.String(required=True, description='The task list description'),
+})
+task_model = api.model('Task', {
+        'title':        fields.String(required=True, description='The task title'),
+        'content':      fields.String(required=True, description='The task content'),
+        'deadline':     fields.DateTime(required=True, description='The task deadline'),
+        'completed':    fields.Boolean(required=True, description='The task completed status'),
+        'created_at':   fields.DateTime(required=True, description='The task creation date'),
+        'updated_at':   fields.DateTime(required=True, description='The task update date'),
+        'task_list_id': fields.Integer(required=True, description='The task task list id'),
+})
 
 
 @api.route('/user')
@@ -45,3 +61,24 @@ class UserInfo(Resource):
     def post(self):
         user = current_user
         return user.__dict__
+
+
+@api.route('/create_task_list')
+class TaskList(Resource):
+    @api.expect(task_list_model)
+    @login_required
+    def get(self):
+        """
+        Create a new task list
+        """
+        user_id = current_user.id
+        new_list = TaskList(
+            name=api.payload['title'],
+            description=api.payload['description'],
+            user_id=user_id
+        )
+
+
+
+def create_task():
+    pass
