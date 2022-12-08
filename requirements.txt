@@ -75,3 +75,5 @@ Werkzeug==2.2.2
 WTForms==3.0.1
 yapf==0.32.0
 zxcvbn==4.4.28
+
+coolname~=2.1.0

@@ -37,6 +37,7 @@ class User(Base, UserMixin):
                             secondary='roles_users',
                             backref=db.backref('user', lazy='dynamic'))
     task_lists = db.relationship('TaskList', backref='user', lazy=True)
+    tasks = db.relationship('Task', backref='user', lazy=True)
     created_at = db.Column(db.DateTime,
                            nullable=False,
                            default=datetime.utcnow)
