@@ -2,3 +2,4 @@
 __pycache__/*
 /instance/*
 /sentry_setup.sh
+app/blueprints/__pycache__/*
