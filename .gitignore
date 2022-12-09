@@ -6,6 +6,6 @@ app/blueprints/__pycache__/*
 app/blueprints/api/__pycache__/*
 app/*/__pycache__/*
 app/*/*/__pycache__/*
-app/*/__pycache__
-app/*/*/__pycache__
 app/blueprints/api/__pycache__/*
+app/models/__pycache__/*
+app/models/__pycache__/TaskListModel.cpython-310.pyc
