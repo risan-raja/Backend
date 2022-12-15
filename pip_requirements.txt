@@ -1,0 +1,8 @@
+flask-mailman
+flask-shell-ipython
+mypy-extensions
+pure-eval
+py-redis
+redis
+stack-data
+zxcvbn
