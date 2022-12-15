@@ -3,4 +3,5 @@
     "workbench.startupEditor": "none",
     "diffEditor.codeLens": true,
     "explorer.fileNesting.enabled": true,
+    "python.formatting.provider": "black",
 }

@@ -22,7 +22,14 @@ class configSecurity(object):
     SECURITY_LOGIN_WITHOUT_CONFIRMATION = False
     SECURITY_REGISTERABLE = True
     SECURITY_UNIFIED_SIGNIN = False
-    SECURITY_USER_IDENTITY_ATTRIBUTES = [{"email": {"mapper": uia_email_mapper, "case_insensitive": True}}, ]
+    SECURITY_USER_IDENTITY_ATTRIBUTES = [
+        {
+            "email": {
+                "mapper": uia_email_mapper,
+                "case_insensitive": True
+            }
+        },
+    ]
     # {"us_phone_number": {"mapper": uia_phone_mapper}},
     SECURITY_US_ENABLED_METHODS = ["password", "email"]
     SECURITY_DEFAULT_REMEMBER_ME = True
@@ -35,6 +42,8 @@ class configSecurity(object):
     These need to be defined to handle redirects
     As defined in the API documentation - they will receive the relevant context
     """
+    #done
+    SECURITY_POST_LOGOUT_VIEW = "http://127.0.0.1/user-login"
     SECURITY_POST_CONFIRM_VIEW = "/confirmed"
     SECURITY_CONFIRM_ERROR_VIEW = "/confirm-error"
     SECURITY_RESET_VIEW = "/reset-password"
@@ -48,6 +57,7 @@ class configSecurity(object):
     """
     SECURITY_CSRF_PROTECT_MECHANISMS = ["session", "basic"]
     SECURITY_CSRF_IGNORE_UNAUTH_ENDPOINTS = True
+    
 
     # Send Cookie with csrf-token. This is the default for Axios and Angular.
     SECURITY_CSRF_COOKIE_NAME = "XSRF-TOKEN"
