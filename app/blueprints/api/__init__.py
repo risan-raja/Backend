@@ -15,18 +15,22 @@ from .api_reqparsers import (
     edit_task_list_parser,
     edit_task_parser,
 )
-
+from flask import request
 
 # noinspection PyShadowingNames
 def get_vac_list_order(current_user):
     list_order = (
-        db_session.query(TaskList).filter_by(user_id=current_user.id).count() + 1
-    )
+        db_session.query(TaskList).filter_by(user_id=current_user.id).count() +
+        1)
     return list_order
 
 
 authorizations = {
-    "apikey": {"type": "apiKey", "in": "header", "name": "Authentication-Token"}
+    "apikey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authentication-Token"
+    }
 }
 api_bp = Blueprint("api", __name__, url_prefix="/api/kanban")
 api = Api(
@@ -44,6 +48,7 @@ user_model, task_model, task_list_model = gen_api_models(api)
 
 @api.route("/user/logout")
 class UserLogout(Resource):
+
     def get(self):
         logout_user()
         return "Logged out"
@@ -56,6 +61,7 @@ class UserLogout(Resource):
 # TESTING TOKEN : "WyJjMTk0NTZlZmQ1MmY0YWFiYTE3ZWU0MDJlMTNjOGM4ZiJd.Y5GjKg.YjFL2O7sSl_0T4ox9N_fjobe2KI"
 @api.route("/user")
 class UserInfo(Resource):
+
     @auth_token_required
     @api.marshal_with(user_model)
     def get(self):
@@ -65,6 +71,7 @@ class UserInfo(Resource):
 
 @api.route("/user/create_task_list")
 class CreateTaskList(Resource):
+
     @auth_token_required
     @api.expect(create_task_list_parser)
     def post(self):
@@ -111,6 +118,7 @@ class CreateTask(Resource):
 
 @api.route("/user/task_lists")
 class GetTaskLists(Resource):
+
     @auth_token_required
     @api.marshal_with(task_list_model)
     def get(self):
@@ -121,6 +129,7 @@ class GetTaskLists(Resource):
 
 @api.route("/user/tasks")
 class GetTasks(Resource):
+
     @auth_token_required
     @api.marshal_with(task_model)
     def get(self):
@@ -131,6 +140,7 @@ class GetTasks(Resource):
 
 @api.route("/user/task_lists")
 class EditTaskLists(Resource):
+
     @auth_token_required
     @api.expect(edit_task_list_parser)
     def get(self):
@@ -147,6 +157,7 @@ class EditTaskLists(Resource):
 
 @api.route("/user/tasks")
 class EditTasks(Resource):
+
     @auth_token_required
     @api.expect(edit_task_parser)
     def get(self):
@@ -161,3 +172,45 @@ class EditTasks(Resource):
         task.deadline = args["deadline"]
         db.session.commit()
         return {"status": "success"}, 201
+
+
+delete_parser = edit_task_parser.copy()
+delete_parser.add_argument("delete_with_transfer",
+                           type=bool,
+                           required=True,
+                           help="Delete task")
+delete_parser.add_argument("transfer_to",
+                           type=str,
+                           required=False,
+                           help="Transfer task to another list")
+
+
+@api.route("/user/task_lists/<task_list_id>")
+class DeleteTaskList(Resource):
+
+    @auth_token_required
+    @api.expect(delete_parser)
+    def delete(self, task_list_id):
+        user_id = current_user.id
+        args = delete_parser.parse_args()
+        task_list_id = uuid.UUID(task_list_id)
+        task_list = TaskList.query.filter_by(id=task_list_id).first()
+        if args["delete_with_transfer"]:
+            transfer_to = uuid.UUID(args["transfer_to"])
+            transfer_list = TaskList.query.filter_by(id=transfer_to).first()
+            tasks = task_list.tasks
+            for task in tasks:
+                transfer_list.tasks.append(task)
+            db.session.commit()
+        db.session.delete(task_list)
+        db.session.commit()
+        return {"status": "success"}, 201
+
+
+@api.route("/user/update")
+class UpdateUser(Resource):
+    @auth_token_required
+    def post(self):
+        user_db = request.json()
+
+

@@ -8,7 +8,7 @@
       <excludeFolder url="file://$MODULE_DIR$/.sqlite3ext" />
       <excludeFolder url="file://$MODULE_DIR$/.vscode" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.11 (flaskvenv)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Flask" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="PyDocumentationSettings">
