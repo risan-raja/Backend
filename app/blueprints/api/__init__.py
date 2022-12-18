@@ -43,7 +43,7 @@ api = Api(
     authorizations=authorizations,
     security="apikey",
 )
-user_model, task_model, task_list_model = gen_api_models(api)
+user_model, task_model, task_list_model, resource_model = gen_api_models(api)
 
 
 @api.route("/user/logout")
@@ -211,6 +211,11 @@ class DeleteTaskList(Resource):
 class UpdateUser(Resource):
     @auth_token_required
     def post(self):
-        user_db = request.json()
+        user_db = request.get_json()
+        print(type(user_db))
+        return user_db
+    
+
+
 
 

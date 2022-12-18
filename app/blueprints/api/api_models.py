@@ -35,5 +35,8 @@ def gen_api_models(api: flask_restx.Api):
             'updated_at':  fields.DateTime(required=True, description='The task list update date'),
             'tasks':       fields.List(fields.Nested(task_model))
     })
+    resource_fields = api.model('Resource', {
+            'name': fields.String,
+    })
 
-    return user_model, task_model, task_list_model
+    return user_model, task_model, task_list_model, resource_fields
