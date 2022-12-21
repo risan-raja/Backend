@@ -212,8 +212,21 @@ class UpdateUser(Resource):
     @auth_token_required
     def post(self):
         user_db = request.get_json()
-        print(type(user_db))
-        return user_db
+        for task_list in user_db.task_lists:
+            task_list_db = TaskList.query.filter_by(id=task_list.id).first()
+            for task in task_list.tasks:
+                task_db = Task.query.filter_by(id=task.id).first()
+                task_db.completed = task.completed
+                task_db.deadline = task.deadline
+                task_db.title = task.title
+                task_db.content = task.content
+                task_db.updated_at = datetime.now()
+                db.session.commit()
+            task_list_db.name = task_list.name
+            task_list_db.description = task_list.description
+            task_list_db.updated_at = datetime.now()
+            db.session.commit()
+        return {"status": "success"}, 201
     
 
 
