@@ -23,7 +23,8 @@ from app.ext.cache import cache
 # noinspection PyShadowingNames
 def get_vac_list_order(current_user):
     list_order = (
-        db_session.query(TaskList).filter_by(user_id=current_user.id).count() + 1
+        db_session.query(TaskList).filter_by(
+            user_id=current_user.id).count() + 1
     )
     return list_order
 
@@ -205,7 +206,7 @@ def update_user(payload):
         task_list_db = TaskList.query.filter_by(id=task_list["id"]).first()
         for task in task_list["tasks"]:
             task_db = Task.query.filter_by(id=task["id"]).first()
-            #task_db.created_at = convert_string_to_datetime(task["created_at"])
+            # task_db.created_at = convert_string_to_datetime(task["created_at"])
             task_db.completed = task["completed"]
             task_db.deadline = convert_string_to_datetime(task["deadline"])
             task_db.title = task["title"]
@@ -214,7 +215,7 @@ def update_user(payload):
             db.session.commit()
         task_list_db.name = task_list["name"]
         task_list_db.description = task_list["description"]
-        #task_list_db.created_at = convert_string_to_datetime(task_list["created_at"])
+        # task_list_db.created_at = convert_string_to_datetime(task_list["created_at"])
         task_list_db.updated_at = datetime.now()
         db.session.commit()
     return {"status": "success"}, 201
