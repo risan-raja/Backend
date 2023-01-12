@@ -1,0 +1,4 @@
+test_recording:
+  test_commands:
+    - env: {}
+      command: flask

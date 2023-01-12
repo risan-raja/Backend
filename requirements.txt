@@ -76,3 +76,5 @@ WTForms
 yapf
 zxcvbn
 coolname
+
+appmap

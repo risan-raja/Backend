@@ -1,7 +1,5 @@
 import flask_wtf
 from flask import Flask
-from flask_debugtoolbar import DebugToolbarExtension
-from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_migrate import Migrate
 from app.database.database import init_db
 from app.ext.background_services import celery, mail
@@ -12,6 +10,9 @@ from app.ext.security import security
 from app.ext.sentry import init_sentry
 from app.blueprints.api import api_bp
 from app.database import db
+
+
+# from appmap.flask import AppmapFlask
 
 # App is behind one proxy that sets the -For and -Host headers.
 
@@ -45,5 +46,5 @@ def create_app():
     #     x_for=1,
     #     x_host=1,
     # )
-
+    # appmap.init_app(app)
     return app

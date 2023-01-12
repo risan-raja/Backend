@@ -6,7 +6,7 @@ py-redis
 redis
 stack-data
 zxcvbn
-Werkzeug <= 2.1.2   
-flask == 2.1.2   
-flask-restx >= 0.5.1  
-
+Werkzeug <= 2.1.2
+flask == 2.1.2
+flask-restx >= 0.5.1
+coolname

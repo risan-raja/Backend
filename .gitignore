@@ -9,3 +9,5 @@ app/blueprints/api/__pycache__/*
 app/models/__pycache__/*
 app/models/__pycache__/TaskListModel.cpython-310.pyc
 .log/*
+/.uwsgi_plugins_builder/
+/venv/

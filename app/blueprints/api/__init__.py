@@ -146,7 +146,29 @@ class GetTasks(Resource):
         task = Task.query.filter_by(id=task_id).first()
         db.session.delete(task)
         db.session.commit()
-        return {"status": "success"}, 200
+        return {"status": "success"}, 204
+
+    @auth_token_required
+    @api.expect(edit_task_parser)
+    def put(self):
+        user_id = current_user.id
+        args = edit_task_parser.parse_args()
+        task_id = uuid.UUID(args["id"])
+        task = Task.query.filter_by(id=task_id).first()
+        task.updated_at = datetime.now()
+        edited_fields = request.get_json()
+        if args["title"]:
+            task.title = args["title"]
+        if args["content"]:
+            task.content = args["content"]
+        if args["completed"]:
+            task.completed = args["completed"]
+        if args["deadline"]:
+            task.deadline = convert_string_to_datetime(args["deadline"])
+        if args["order"]:
+            task.order = args["order"]
+        db.session.commit()
+        return {"status": "success"}, 201
 
 
 @api.route("/user/task_lists")
@@ -166,25 +188,7 @@ class EditTaskLists(Resource):
         return {"status": "success"}, 201
 
 
-@api.route("/user/tasks")
-class EditTasks(Resource):
-    @auth_token_required
-    @api.expect(edit_task_parser)
-    def post(self):
-        user_id = current_user.id
-        args = edit_task_parser.parse_args()
-        task_id = uuid.UUID(args["id"])
-        task = Task.query.filter_by(id=task_id).first()
-        task.updated_at = datetime.now()
-        edited_fields = request.get_json()
 
-        task.title = args["title"]
-        task.content = args["content"]
-        task.completed = args["completed"]
-        task.deadline = convert_string_to_datetime(args["deadline"])
-        task.order = args["order"]
-        db.session.commit()
-        return {"status": "success"}, 201
 
 
 delete_parser = edit_task_list_parser.copy()
