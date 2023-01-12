@@ -2,6 +2,7 @@ import uuid
 from datetime import datetime
 
 from flask import Blueprint
+from flask import request
 from flask_restx import Api, Resource
 from flask_security import auth_token_required, current_user, logout_user
 
@@ -15,22 +16,23 @@ from .api_reqparsers import (
     edit_task_list_parser,
     edit_task_parser,
 )
-from flask import request
-from app.ext.background_services import celery
-from app.ext.cache import cache
+
+
+def convert_string_to_datetime(date):
+    return datetime.strptime(date, "%Y-%m-%dT%H:%M:%S.%fZ")
 
 
 # noinspection PyShadowingNames
 def get_vac_list_order(current_user):
     list_order = (
-        db_session.query(TaskList).filter_by(
-            user_id=current_user.id).count() + 1
+            db_session.query(TaskList).filter_by(
+                user_id=current_user.id).count() + 1
     )
     return list_order
 
 
 authorizations = {
-    "apikey": {"type": "apiKey", "in": "header", "name": "Authentication-Token"}
+        "apikey": {"type": "apiKey", "in": "header", "name": "Authentication-Token"}
 }
 api_bp = Blueprint("api", __name__, url_prefix="/api/kanban")
 api = Api(
@@ -108,6 +110,7 @@ class CreateTask(Resource):
         val.updated_at = datetime.now()
         val.user_id = user_id
         val.task_list_id = task_list_id
+        val.order = new_task_args["order"]
         db.session.add(val)
         db.session.commit()
         return {"status": "success"}, 201
@@ -132,18 +135,32 @@ class GetTasks(Resource):
         tasks = current_user.tasks
         return tasks, 200
 
+    @auth_token_required
+    @api.expect(edit_task_parser)
+    def delete(self):
+        """
+        Delete a task
+        """
+        user_id = current_user.id
+        task_id = request.get_json()["id"]
+        task = Task.query.filter_by(id=task_id).first()
+        db.session.delete(task)
+        db.session.commit()
+        return {"status": "success"}, 200
+
 
 @api.route("/user/task_lists")
 class EditTaskLists(Resource):
     @auth_token_required
     @api.expect(edit_task_list_parser)
-    def get(self):
+    def post(self):
         user_id = current_user.id
         args = edit_task_list_parser.parse_args()
         task_list_id = uuid.UUID(args["task_list_id"])
         task_list = TaskList.query.filter_by(id=task_list_id).first()
         task_list.name = args["name"]
         task_list.description = args["description"]
+        task_list.order = args["list_order"]
         task_list.updated_at = datetime.now()
         db.session.commit()
         return {"status": "success"}, 201
@@ -153,21 +170,22 @@ class EditTaskLists(Resource):
 class EditTasks(Resource):
     @auth_token_required
     @api.expect(edit_task_parser)
-    def get(self):
+    def post(self):
         user_id = current_user.id
         args = edit_task_parser.parse_args()
-        task_id = uuid.UUID(args["task_id"])
+        task_id = uuid.UUID(args["id"])
         task = Task.query.filter_by(id=task_id).first()
+        task.updated_at = datetime.now()
         task.title = args["title"]
         task.content = args["content"]
-        task.updated_at = datetime.now()
         task.completed = args["completed"]
-        task.deadline = args["deadline"]
+        task.deadline = convert_string_to_datetime(args["deadline"])
+        task.order = args["order"]
         db.session.commit()
         return {"status": "success"}, 201
 
 
-delete_parser = edit_task_parser.copy()
+delete_parser = edit_task_list_parser.copy()
 delete_parser.add_argument(
     "delete_with_transfer", type=bool, required=True, help="Delete task"
 )
@@ -197,25 +215,21 @@ class DeleteTaskList(Resource):
         return {"status": "success"}, 201
 
 
-def convert_string_to_datetime(date):
-    return datetime.strptime(date, "%Y-%m-%dT%H:%M:%S.%fZ")
-
-
 def update_user(payload):
     for task_list in payload["task_lists"]:
         task_list_db = TaskList.query.filter_by(id=task_list["id"]).first()
         for task in task_list["tasks"]:
             task_db = Task.query.filter_by(id=task["id"]).first()
-            # task_db.created_at = convert_string_to_datetime(task["created_at"])
             task_db.completed = task["completed"]
             task_db.deadline = convert_string_to_datetime(task["deadline"])
             task_db.title = task["title"]
             task_db.content = task["content"]
             task_db.updated_at = datetime.now()
+            task_db.order = task["order"]
             db.session.commit()
         task_list_db.name = task_list["name"]
         task_list_db.description = task_list["description"]
-        # task_list_db.created_at = convert_string_to_datetime(task_list["created_at"])
+        task_list_db.list_order = task_list["list_order"]
         task_list_db.updated_at = datetime.now()
         db.session.commit()
     return {"status": "success"}, 201

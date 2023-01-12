@@ -103,6 +103,15 @@ create_task_parser.add_argument(
     nullable=True,
     default=datetime.utcnow()
 )
+create_task_parser.add_argument(
+    name='order',
+    required=True,
+    type=int,
+    location='json',
+    help='Task Index',
+    store_missing=False,
+    nullable=False
+)
 
 edit_task_list_parser = create_task_list_parser.copy()
 edit_task_list_parser.add_argument(
