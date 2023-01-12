@@ -176,6 +176,8 @@ class EditTasks(Resource):
         task_id = uuid.UUID(args["id"])
         task = Task.query.filter_by(id=task_id).first()
         task.updated_at = datetime.now()
+        edited_fields = request.get_json()
+
         task.title = args["title"]
         task.content = args["content"]
         task.completed = args["completed"]

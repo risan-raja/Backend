@@ -128,4 +128,7 @@ edit_task_parser.add_argument(
     type=str,
     location='json',
     help='ID of the Task')
-
+edit_task_parser.replace_argument('order', required=False)
+edit_task_parser.replace_argument('title', required=False)
+edit_task_list_parser.replace_argument('list_order', required=False)
+edit_task_list_parser.replace_argument('name', required=False)
