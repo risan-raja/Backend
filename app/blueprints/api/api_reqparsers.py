@@ -91,7 +91,8 @@ create_task_parser.add_argument(
     location='json',
     help='Completed status of the Task',
     store_missing=True,
-    nullable=False
+    nullable=False,
+    default=False
 )
 create_task_parser.add_argument(
     name='updated_at',
@@ -128,7 +129,15 @@ edit_task_parser.add_argument(
     type=str,
     location='json',
     help='ID of the Task')
-edit_task_parser.replace_argument('order', required=False)
-edit_task_parser.replace_argument('title', required=False)
+edit_task_parser.replace_argument('order', required=False, location='json')
+edit_task_parser.replace_argument('title', required=False,location='json')
 edit_task_list_parser.replace_argument('list_order', required=False)
 edit_task_list_parser.replace_argument('name', required=False)
+
+delete_task_parser = reqparse.RequestParser()
+delete_task_parser.add_argument(
+    name='id',
+    required=True,
+    type=str,
+    location='json',
+    help='ID of the Task')

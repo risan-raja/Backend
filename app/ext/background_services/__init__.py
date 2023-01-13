@@ -1,4 +1,3 @@
-from appmap.flask import AppmapFlask
 from celery import Celery
 from flask_mailman import Mail
 
@@ -8,6 +7,7 @@ mail = Mail()
 celery = Celery(__name__, broker=Config.CELERY_BROKER_URL,
                 backend=Config.CELERY_RESULT_BACKEND
                 )
+
 
 # appmap = AppmapFlask()
 @celery.task(name='add_this')

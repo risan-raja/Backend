@@ -1,7 +1,8 @@
+import uuid
 from datetime import datetime
 
 from flask_security import RoleMixin, UserMixin
-import uuid
+
 from app.database import GUID, db
 from . import Base
 
@@ -44,14 +45,13 @@ class User(Base, UserMixin):
     current_login_ip = db.Column(db.String(100))
     last_login_ip = db.Column(db.String(100))
     confirmed_at = db.Column(db.DateTime())
-
-    # dob = db.Column(db.DateTime, nullable=True)
+    offline_db = db.Column(db.Boolean, default=False)
 
     def get_security_payload(self):
         return {
-            'email': self.email,
-            'first_name': self.first_name,
-            'last_name': self.last_name,
-            'active': self.active,
-            'confirmed_at': self.confirmed_at,
+                'email':        self.email,
+                'first_name':   self.first_name,
+                'last_name':    self.last_name,
+                'active':       self.active,
+                'confirmed_at': self.confirmed_at,
         }

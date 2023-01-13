@@ -10,12 +10,8 @@ from app.database import db
 from app.database.database import db_session
 from app.models import Task, TaskList
 from .api_models import gen_api_models
-from .api_reqparsers import (
-    create_task_list_parser,
-    create_task_parser,
-    edit_task_list_parser,
-    edit_task_parser,
-)
+from .api_reqparsers import (create_task_list_parser, create_task_parser, delete_task_parser, edit_task_list_parser,
+                             edit_task_parser)
 
 
 def convert_string_to_datetime(date):
@@ -136,14 +132,15 @@ class GetTasks(Resource):
         return tasks, 200
 
     @auth_token_required
-    @api.expect(edit_task_parser)
+    @api.expect(delete_task_parser)
     def delete(self):
         """
         Delete a task
         """
         user_id = current_user.id
-        task_id = request.get_json()["id"]
-        task = Task.query.filter_by(id=task_id).first()
+        delete_task_args = delete_task_parser.parse_args()
+        task_id = delete_task_args["id"]
+        task = Task.query.get(task_id)
         db.session.delete(task)
         db.session.commit()
         return {"status": "success"}, 204
@@ -154,19 +151,18 @@ class GetTasks(Resource):
         user_id = current_user.id
         args = edit_task_parser.parse_args()
         task_id = uuid.UUID(args["id"])
-        task = Task.query.filter_by(id=task_id).first()
+        task = Task.query.get(task_id)
         task.updated_at = datetime.now()
         edited_fields = request.get_json()
-        if args["title"]:
-            task.title = args["title"]
-        if args["content"]:
-            task.content = args["content"]
-        if args["completed"]:
-            task.completed = args["completed"]
-        if args["deadline"]:
-            task.deadline = convert_string_to_datetime(args["deadline"])
-        if args["order"]:
-            task.order = args["order"]
+        try:
+            edited_fields.pop("id")
+        except KeyError:
+            return {"status": "error", "message": "No id provided"}, 400
+        for key in edited_fields:
+            if key == "deadline":
+                task[key] = convert_string_to_datetime(edited_fields[key])
+            else:
+                task[key] = edited_fields[key]
         db.session.commit()
         return {"status": "success"}, 201
 
@@ -179,16 +175,14 @@ class EditTaskLists(Resource):
         user_id = current_user.id
         args = edit_task_list_parser.parse_args()
         task_list_id = uuid.UUID(args["task_list_id"])
-        task_list = TaskList.query.filter_by(id=task_list_id).first()
+        # task_list = TaskList.query.filter_by(id=task_list_id).first()
+        task_list = TaskList.query.get(task_list_id)
         task_list.name = args["name"]
         task_list.description = args["description"]
         task_list.order = args["list_order"]
         task_list.updated_at = datetime.now()
         db.session.commit()
         return {"status": "success"}, 201
-
-
-
 
 
 delete_parser = edit_task_list_parser.copy()
@@ -208,7 +202,7 @@ class DeleteTaskList(Resource):
         user_id = current_user.id
         args = delete_parser.parse_args()
         task_list_id = uuid.UUID(task_list_id)
-        task_list = TaskList.query.filter_by(id=task_list_id).first()
+        task_list = TaskList.query.get(task_list_id)
         if args["delete_with_transfer"]:
             transfer_to = uuid.UUID(args["transfer_to"])
             transfer_list = TaskList.query.filter_by(id=transfer_to).first()
@@ -218,33 +212,33 @@ class DeleteTaskList(Resource):
             db.session.commit()
         db.session.delete(task_list)
         db.session.commit()
-        return {"status": "success"}, 201
-
-
-def update_user(payload):
-    for task_list in payload["task_lists"]:
-        task_list_db = TaskList.query.filter_by(id=task_list["id"]).first()
-        for task in task_list["tasks"]:
-            task_db = Task.query.filter_by(id=task["id"]).first()
-            task_db.completed = task["completed"]
-            task_db.deadline = convert_string_to_datetime(task["deadline"])
-            task_db.title = task["title"]
-            task_db.content = task["content"]
-            task_db.updated_at = datetime.now()
-            task_db.order = task["order"]
-            db.session.commit()
-        task_list_db.name = task_list["name"]
-        task_list_db.description = task_list["description"]
-        task_list_db.list_order = task_list["list_order"]
-        task_list_db.updated_at = datetime.now()
-        db.session.commit()
-    return {"status": "success"}, 201
+        return {"status": "success"}, 204
 
 
 @api.route("/user/updater")
 class UpdateUser(Resource):
+    @staticmethod
+    def update_user(payload):
+        for task_list in payload["task_lists"]:
+            task_list_db = TaskList.query.filter_by(id=task_list["id"]).first()
+            for task in task_list["tasks"]:
+                task_db = Task.query.filter_by(id=task["id"]).first()
+                task_db.completed = task["completed"]
+                task_db.deadline = convert_string_to_datetime(task["deadline"])
+                task_db.title = task["title"]
+                task_db.content = task["content"]
+                task_db.updated_at = datetime.now()
+                task_db.order = task["order"]
+                db.session.commit()
+            task_list_db.name = task_list["name"]
+            task_list_db.description = task_list["description"]
+            task_list_db.list_order = task_list["list_order"]
+            task_list_db.updated_at = datetime.now()
+            db.session.commit()
+        return {"status": "success"}, 201
+
     @auth_token_required
     def post(self):
         user_db = request.get_json()
-        update_user(payload=user_db)
+        self.update_user(payload=user_db)
         return {"status": "success"}, 201
