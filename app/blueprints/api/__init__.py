@@ -7,24 +7,13 @@ from flask_restx import Api, Resource
 from flask_security import auth_token_required, current_user, logout_user
 
 from app.database import db
-from app.database.database import db_session
 from app.models import Task, TaskList
 from .api_models import gen_api_models
-from .api_reqparsers import (create_task_list_parser, create_task_parser, delete_task_parser, edit_task_list_parser,
-                             edit_task_parser)
+from .api_reqparsers import ApiReqParsers
 
 
 def convert_string_to_datetime(date):
     return datetime.strptime(date, "%Y-%m-%dT%H:%M:%S.%fZ")
-
-
-# noinspection PyShadowingNames
-def get_vac_list_order(current_user):
-    list_order = (
-            db_session.query(TaskList).filter_by(
-                user_id=current_user.id).count() + 1
-    )
-    return list_order
 
 
 authorizations = {
@@ -44,6 +33,7 @@ api = Api(
 user_model, task_model, task_list_model, resource_model = gen_api_models(api)
 
 
+# noinspection PyMethodMayBeStatic
 @api.route("/user/logout")
 class UserLogout(Resource):
     def get(self):
@@ -55,7 +45,6 @@ class UserLogout(Resource):
         return "Logged out"
 
 
-# TESTING TOKEN : "WyJjMTk0NTZlZmQ1MmY0YWFiYTE3ZWU0MDJlMTNjOGM4ZiJd.Y5GjKg.YjFL2O7sSl_0T4ox9N_fjobe2KI"
 @api.route("/user")
 class UserInfo(Resource):
     @auth_token_required
@@ -65,33 +54,80 @@ class UserInfo(Resource):
         return user.__dict__
 
 
-@api.route("/user/create_task_list")
-class CreateTaskList(Resource):
+req_parsers = ApiReqParsers()
+create_task_list_parser = req_parsers.create_task_list_parser
+delete_task_list_parser = req_parsers.delete_task_list_parser
+edit_task_list_parser = req_parsers.edit_task_list_parser
+create_task_parser = req_parsers.create_task_parser
+delete_task_parser = req_parsers.delete_task_parser
+edit_task_parser = req_parsers.edit_task_parser
+
+
+@api.route("/user/task_lists")
+class TaskListApi(Resource):
+
     @auth_token_required
     @api.expect(create_task_list_parser)
     def post(self):
         """
         Create a new task list
         """
-        user_id = current_user.id
-        new_list_args = create_task_list_parser.parse_args()
+        user_id: str = current_user.id
+        new_task_list = create_task_list_parser.parse_args()
         val = TaskList()
-        val.name = new_list_args["name"]
-        val.description = new_list_args["description"]
-        val.created_at = datetime.now()
-        val.updated_at = datetime.now()
+        val.name = new_task_list["name"]
+        val.description = new_task_list["description"]
+        val.created_at = datetime.utcnow()
+        val.updated_at = new_task_list["updated_at"]
         val.user_id = user_id
-        val.list_order = get_vac_list_order(current_user)
+        val.list_order = new_task_list["list_order"]
         db.session.add(val)
         db.session.commit()
         return {"status": "success"}, 201
 
+    @auth_token_required
+    @api.marshal_with(task_list_model)
+    def get(self):
+        user_id = current_user.id
+        task_lists = current_user.task_lists
+        return task_lists, 200
 
-@api.route("/user/<task_list_id>/create_task")
-class CreateTask(Resource):
-    """
-    Create a new task
-    """
+    @auth_token_required
+    @api.expect(edit_task_list_parser)
+    def post(self):
+        user_id = current_user.id
+        args = edit_task_list_parser.parse_args()
+        task_list_id = uuid.UUID(args["task_list_id"])
+        # task_list = TaskList.query.filter_by(id=task_list_id).first()
+        task_list = TaskList.query.get(task_list_id)
+        task_list.name = args["name"]
+        task_list.description = args["description"]
+        task_list.order = args["list_order"]
+        task_list.updated_at = datetime.now()
+        db.session.commit()
+        return {"status": "success"}, 201
+
+    @auth_token_required
+    @api.expect(delete_task_list_parser)
+    def delete(self, task_list_id):
+        user_id = current_user.id
+        args = delete_task_list_parser.parse_args()
+        task_list_id = uuid.UUID(task_list_id)
+        task_list = TaskList.query.get(task_list_id)
+        if args["delete_with_transfer"]:
+            transfer_to = uuid.UUID(args["transfer_to"])
+            transfer_list = TaskList.query.filter_by(id=transfer_to).first()
+            tasks = task_list.tasks
+            for task in tasks:
+                transfer_list.tasks.append(task)
+            db.session.commit()
+        db.session.delete(task_list)
+        db.session.commit()
+        return {"status": "success"}, 204
+
+
+@api.route("/user/tasks")
+class TaskApi(Resource):
 
     @auth_token_required
     @api.expect(create_task_parser)
@@ -111,19 +147,6 @@ class CreateTask(Resource):
         db.session.commit()
         return {"status": "success"}, 201
 
-
-@api.route("/user/task_lists")
-class GetTaskLists(Resource):
-    @auth_token_required
-    @api.marshal_with(task_list_model)
-    def get(self):
-        user_id = current_user.id
-        task_lists = current_user.task_lists
-        return task_lists, 200
-
-
-@api.route("/user/tasks")
-class GetTasks(Resource):
     @auth_token_required
     @api.marshal_with(task_model)
     def get(self):
@@ -167,55 +190,7 @@ class GetTasks(Resource):
         return {"status": "success"}, 201
 
 
-@api.route("/user/task_lists")
-class EditTaskLists(Resource):
-    @auth_token_required
-    @api.expect(edit_task_list_parser)
-    def post(self):
-        user_id = current_user.id
-        args = edit_task_list_parser.parse_args()
-        task_list_id = uuid.UUID(args["task_list_id"])
-        # task_list = TaskList.query.filter_by(id=task_list_id).first()
-        task_list = TaskList.query.get(task_list_id)
-        task_list.name = args["name"]
-        task_list.description = args["description"]
-        task_list.order = args["list_order"]
-        task_list.updated_at = datetime.now()
-        db.session.commit()
-        return {"status": "success"}, 201
-
-
-delete_parser = edit_task_list_parser.copy()
-delete_parser.add_argument(
-    "delete_with_transfer", type=bool, required=True, help="Delete task"
-)
-delete_parser.add_argument(
-    "transfer_to", type=str, required=False, help="Transfer task to another list"
-)
-
-
-@api.route("/user/task_lists/<task_list_id>")
-class DeleteTaskList(Resource):
-    @auth_token_required
-    @api.expect(delete_parser)
-    def delete(self, task_list_id):
-        user_id = current_user.id
-        args = delete_parser.parse_args()
-        task_list_id = uuid.UUID(task_list_id)
-        task_list = TaskList.query.get(task_list_id)
-        if args["delete_with_transfer"]:
-            transfer_to = uuid.UUID(args["transfer_to"])
-            transfer_list = TaskList.query.filter_by(id=transfer_to).first()
-            tasks = task_list.tasks
-            for task in tasks:
-                transfer_list.tasks.append(task)
-            db.session.commit()
-        db.session.delete(task_list)
-        db.session.commit()
-        return {"status": "success"}, 204
-
-
-@api.route("/user/updater")
+@api.route("/user/sync")
 class UpdateUser(Resource):
     @staticmethod
     def update_user(payload):

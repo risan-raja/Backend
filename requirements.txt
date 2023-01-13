@@ -77,4 +77,3 @@ yapf
 zxcvbn
 coolname
 
-appmap

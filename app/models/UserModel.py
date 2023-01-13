@@ -2,6 +2,7 @@ import uuid
 from datetime import datetime
 
 from flask_security import RoleMixin, UserMixin
+from sqlalchemy.ext.orderinglist import ordering_list
 
 from app.database import GUID, db
 from . import Base
@@ -37,15 +38,18 @@ class User(Base, UserMixin):
     roles = db.relationship('Role',
                             secondary='roles_users',
                             backref=db.backref('user', lazy='dynamic'))
-    task_lists = db.relationship('TaskList', backref='user', lazy=True)
-    tasks = db.relationship('Task', backref='user', lazy=True)
+    task_lists = db.relationship('TaskList', back_populates='user', lazy=True,
+                                 cascade='all,delete',
+                                 order_by='TaskList.list_order',
+                                 collection_class=ordering_list('list_order', count_from=0))
+    tasks = db.relationship('Task', back_populates='user', lazy=True)
     created_at = db.Column(db.DateTime,
                            nullable=False,
                            default=datetime.utcnow)
     current_login_ip = db.Column(db.String(100))
     last_login_ip = db.Column(db.String(100))
     confirmed_at = db.Column(db.DateTime())
-    offline_db = db.Column(db.Boolean, default=False)
+    offline_db = db.Column(db.Boolean, default=False, nullable=True)
 
     def get_security_payload(self):
         return {
@@ -55,3 +59,14 @@ class User(Base, UserMixin):
                 'active':       self.active,
                 'confirmed_at': self.confirmed_at,
         }
+
+# class Preferences(Base):
+#     __tablename__ = 'preferences'
+#     id = db.Column(GUID, primary_key=True, default=uuid.uuid4)
+#     user_id = db.Column(GUID, db.ForeignKey('user.id'), nullable=False)
+#     offline_db = db.Column(db.Boolean, default=False)
+#     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+#     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+#
+#     def __repr__(self):
+#         return '<Preferences %r>' % self.user_id
