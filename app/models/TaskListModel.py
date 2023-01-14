@@ -4,9 +4,9 @@ from datetime import datetime
 from pytz import timezone
 from sqlalchemy.ext.orderinglist import ordering_list
 # noinspection PyUnresolvedReferences
-from sqlalchemy.orm import synonym
-# noinspection PyUnresolvedReferences
 from sqlalchemy.orm import declarative_base, relationship
+# noinspection PyUnresolvedReferences
+from sqlalchemy.orm import synonym
 
 from app.database import GUID, db
 from . import Base
@@ -34,14 +34,11 @@ class TaskList(Base):
         cascade='all,delete-orphan',
         order_by='Task.order',
         collection_class=ordering_list('order', count_from=0),
-        lazy=True
+        lazy="selectin"
     )
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow())
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow())
     list_order = db.Column(db.Integer, nullable=True)
-
-    def get_total_tasks(self):
-        return self.tasks.count()
 
     def __repr__(self):
         return '<List %r>' % self.name

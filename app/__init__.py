@@ -1,6 +1,9 @@
 import flask_wtf
 from flask import Flask
 from flask_migrate import Migrate
+
+from app.blueprints.api import api_bp
+from app.database import db
 from app.database.database import init_db
 from app.ext.background_services import celery, mail
 from app.ext.cache import cache
@@ -8,11 +11,7 @@ from app.ext.cors import cors
 from app.ext.security import ExtendedRegisterForm, MyMailUtil, security, user_datastore
 from app.ext.security import security
 from app.ext.sentry import init_sentry
-from app.blueprints.api import api_bp
-from app.database import db
 
-
-# from appmap.flask import AppmapFlask
 
 # App is behind one proxy that sets the -For and -Host headers.
 
@@ -41,10 +40,5 @@ def create_app():
                       mail_util_cls=MyMailUtil)
     celery.conf.update(app.config)
     app.register_blueprint(api_bp)
-    # ProxyFix(
-    #     app,
-    #     x_for=1,
-    #     x_host=1,
-    # )
-    # appmap.init_app(app)
+
     return app

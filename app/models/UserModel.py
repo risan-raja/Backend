@@ -38,11 +38,12 @@ class User(Base, UserMixin):
     roles = db.relationship('Role',
                             secondary='roles_users',
                             backref=db.backref('user', lazy='dynamic'))
-    task_lists = db.relationship('TaskList', back_populates='user', lazy=True,
+    task_lists = db.relationship('TaskList', back_populates='user', lazy="selectin",
                                  cascade='all,delete',
                                  order_by='TaskList.list_order',
                                  collection_class=ordering_list('list_order', count_from=0))
-    tasks = db.relationship('Task', back_populates='user', lazy=True)
+    tasks = db.relationship('Task', back_populates='user', lazy="selectin")
+
     created_at = db.Column(db.DateTime,
                            nullable=False,
                            default=datetime.utcnow)

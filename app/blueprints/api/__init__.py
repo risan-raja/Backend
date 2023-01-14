@@ -55,25 +55,19 @@ class UserInfo(Resource):
 
 
 req_parsers = ApiReqParsers()
-create_task_list_parser = req_parsers.create_task_list_parser
-delete_task_list_parser = req_parsers.delete_task_list_parser
-edit_task_list_parser = req_parsers.edit_task_list_parser
-create_task_parser = req_parsers.create_task_parser
-delete_task_parser = req_parsers.delete_task_parser
-edit_task_parser = req_parsers.edit_task_parser
 
 
 @api.route("/user/task_lists")
 class TaskListApi(Resource):
 
     @auth_token_required
-    @api.expect(create_task_list_parser)
+    @api.expect(req_parsers.create_task_list_parser)
     def post(self):
         """
         Create a new task list
         """
+        new_task_list = req_parsers.create_task_list_parser.parse_args()
         user_id: str = current_user.id
-        new_task_list = create_task_list_parser.parse_args()
         val = TaskList()
         val.name = new_task_list["name"]
         val.description = new_task_list["description"]
@@ -93,10 +87,10 @@ class TaskListApi(Resource):
         return task_lists, 200
 
     @auth_token_required
-    @api.expect(edit_task_list_parser)
-    def post(self):
+    @api.expect(req_parsers.edit_task_list_parser)
+    def put(self):
         user_id = current_user.id
-        args = edit_task_list_parser.parse_args()
+        args = req_parsers.edit_task_list_parser.parse_args()
         task_list_id = uuid.UUID(args["task_list_id"])
         # task_list = TaskList.query.filter_by(id=task_list_id).first()
         task_list = TaskList.query.get(task_list_id)
@@ -108,10 +102,10 @@ class TaskListApi(Resource):
         return {"status": "success"}, 201
 
     @auth_token_required
-    @api.expect(delete_task_list_parser)
+    @api.expect(req_parsers.delete_task_list_parser)
     def delete(self, task_list_id):
         user_id = current_user.id
-        args = delete_task_list_parser.parse_args()
+        args = req_parsers.delete_task_list_parser.parse_args()
         task_list_id = uuid.UUID(task_list_id)
         task_list = TaskList.query.get(task_list_id)
         if args["delete_with_transfer"]:
@@ -130,9 +124,9 @@ class TaskListApi(Resource):
 class TaskApi(Resource):
 
     @auth_token_required
-    @api.expect(create_task_parser)
+    @api.expect(req_parsers.create_task_parser)
     def post(self, task_list_id):
-        new_task_args = create_task_parser.parse_args()
+        new_task_args = req_parsers.create_task_parser.parse_args()
         task_list_id = uuid.UUID(task_list_id)
         user_id = current_user.id
         val = Task()
@@ -155,13 +149,13 @@ class TaskApi(Resource):
         return tasks, 200
 
     @auth_token_required
-    @api.expect(delete_task_parser)
+    @api.expect(req_parsers.delete_task_parser)
     def delete(self):
         """
         Delete a task
         """
         user_id = current_user.id
-        delete_task_args = delete_task_parser.parse_args()
+        delete_task_args = req_parsers.delete_task_parser.parse_args()
         task_id = delete_task_args["id"]
         task = Task.query.get(task_id)
         db.session.delete(task)
@@ -169,10 +163,10 @@ class TaskApi(Resource):
         return {"status": "success"}, 204
 
     @auth_token_required
-    @api.expect(edit_task_parser)
+    @api.expect(req_parsers.edit_task_parser)
     def put(self):
         user_id = current_user.id
-        args = edit_task_parser.parse_args()
+        args = req_parsers.edit_task_parser.parse_args()
         task_id = uuid.UUID(args["id"])
         task = Task.query.get(task_id)
         task.updated_at = datetime.now()
@@ -183,9 +177,11 @@ class TaskApi(Resource):
             return {"status": "error", "message": "No id provided"}, 400
         for key in edited_fields:
             if key == "deadline":
-                task[key] = convert_string_to_datetime(edited_fields[key])
+                # task[key] = convert_string_to_datetime(edited_fields[key])
+                setattr(task, key, convert_string_to_datetime(edited_fields[key]))
             else:
-                task[key] = edited_fields[key]
+                # task[key] = edited_fields[key]
+                setattr(task, key, edited_fields[key])
         db.session.commit()
         return {"status": "success"}, 201
 
@@ -195,25 +191,28 @@ class UpdateUser(Resource):
     @staticmethod
     def update_user(payload):
         for task_list in payload["task_lists"]:
-            task_list_db = TaskList.query.filter_by(id=task_list["id"]).first()
+            task_list_db = TaskList.query.get(id=task_list["id"])
             for task in task_list["tasks"]:
-                task_db = Task.query.filter_by(id=task["id"]).first()
+                task_db = Task.query.get(id=task["id"])
                 task_db.completed = task["completed"]
                 task_db.deadline = convert_string_to_datetime(task["deadline"])
                 task_db.title = task["title"]
                 task_db.content = task["content"]
-                task_db.updated_at = datetime.now()
+                task_db.updated_at = task["updated_at"]
                 task_db.order = task["order"]
                 db.session.commit()
             task_list_db.name = task_list["name"]
             task_list_db.description = task_list["description"]
             task_list_db.list_order = task_list["list_order"]
-            task_list_db.updated_at = datetime.now()
-            db.session.commit()
-        return {"status": "success"}, 201
+            task_list_db.updated_at = task_list["updated_at"]
 
+    # noinspection PyBroadException
     @auth_token_required
     def post(self):
         user_db = request.get_json()
-        self.update_user(payload=user_db)
+        try:
+            self.update_user(payload=user_db)
+        # noinspection PyBroadException
+        except:
+            return {"status": "error", "message": "Error updating user"}, 400
         return {"status": "success"}, 201

@@ -1,4 +1,5 @@
 */__pycache__/*
+*/.pypy_*/*
 __pycache__/*
 /sentry_setup.sh
 app/blueprints/__pycache__/*
@@ -11,3 +12,4 @@ app/models/__pycache__/TaskListModel.cpython-310.pyc
 .log/*
 /.uwsgi_plugins_builder/
 /venv/
+/.pypy_wheels/*
