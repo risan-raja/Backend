@@ -1,12 +1,15 @@
 import uuid
 from datetime import datetime
-
-from flask import Blueprint
+from gevent import monkey
+monkey.patch_all()
+from flask import Blueprint, jsonify
+from flask import current_app
 from flask import request
 from flask_restx import Api, Resource
 from flask_security import auth_token_required, current_user, logout_user
 
 from app.database import db
+from app.ext.cache import cache
 from app.models import Task, TaskList
 from .api_models import gen_api_models
 from .api_reqparsers import ApiReqParsers
@@ -67,7 +70,7 @@ class TaskListApi(Resource):
         Create a new task list
         """
         new_task_list = req_parsers.create_task_list_parser.parse_args()
-        user_id: str = current_user.id
+        user_id = current_user.id
         val = TaskList()
         val.name = new_task_list["name"]
         val.description = new_task_list["description"]
@@ -91,7 +94,7 @@ class TaskListApi(Resource):
     def put(self):
         user_id = current_user.id
         args = req_parsers.edit_task_list_parser.parse_args()
-        task_list_id = uuid.UUID(args["task_list_id"])
+        task_list_id = args["task_list_id"]
         # task_list = TaskList.query.filter_by(id=task_list_id).first()
         task_list = TaskList.query.get(task_list_id)
         task_list.name = args["name"]
@@ -106,10 +109,10 @@ class TaskListApi(Resource):
     def delete(self, task_list_id):
         user_id = current_user.id
         args = req_parsers.delete_task_list_parser.parse_args()
-        task_list_id = uuid.UUID(task_list_id)
+        task_list_id = task_list_id
         task_list = TaskList.query.get(task_list_id)
         if args["delete_with_transfer"]:
-            transfer_to = uuid.UUID(args["transfer_to"])
+            transfer_to = args["transfer_to"]
             transfer_list = TaskList.query.filter_by(id=transfer_to).first()
             tasks = task_list.tasks
             for task in tasks:
@@ -120,6 +123,29 @@ class TaskListApi(Resource):
         return {"status": "success"}, 204
 
 
+def get_task(task_id):
+    with current_app.app_context():
+        t = Task.query.get(task_id)
+    return t
+
+
+from .dfs import DATA
+
+
+@api.route("/user/tasks/<task_id>")
+class GTask(Resource):
+    # @auth_token_required
+    # @api.marshal_with(task_model)
+    # @cache.cached(timeout=1)
+    # @auth_token_required
+    def get(self, task_id: str):
+        task_id = task_id
+        e = Task.query.all()
+        t = TaskList.query.all()
+        return "Task.query.get(task_id)"
+        # return get_task(task_id)
+
+
 @api.route("/user/tasks")
 class TaskApi(Resource):
 
@@ -127,7 +153,7 @@ class TaskApi(Resource):
     @api.expect(req_parsers.create_task_parser)
     def post(self, task_list_id):
         new_task_args = req_parsers.create_task_parser.parse_args()
-        task_list_id = uuid.UUID(task_list_id)
+        task_list_id = task_list_id
         user_id = current_user.id
         val = Task()
         val.title = new_task_args["title"]
@@ -167,7 +193,7 @@ class TaskApi(Resource):
     def put(self):
         user_id = current_user.id
         args = req_parsers.edit_task_parser.parse_args()
-        task_id = uuid.UUID(args["id"])
+        task_id = args["id"]
         task = Task.query.get(task_id)
         task.updated_at = datetime.now()
         edited_fields = request.get_json()

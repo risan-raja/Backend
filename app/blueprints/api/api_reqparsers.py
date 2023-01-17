@@ -134,7 +134,7 @@ class ApiReqParsers(object):
         _edit_task_list_parser.add_argument(
             name='id',
             required=True,
-            type=str,
+            type=int,
             location='json',
             help='ID of the Task List')
         _edit_task_list_parser.replace_argument(
@@ -152,7 +152,7 @@ class ApiReqParsers(object):
         _edit_task_parser.add_argument(
             name='id',
             required=True,
-            type=str,
+            type=int,
             location='json',
             help='ID of the Task')
         _edit_task_parser.replace_argument('order', required=False, location='json')
@@ -165,7 +165,7 @@ class ApiReqParsers(object):
         _delete_task_parser.add_argument(
             name='id',
             required=True,
-            type=str,
+            type=int,
             location='json',
             help='ID of the Task')
         return _delete_task_parser
@@ -176,7 +176,7 @@ class ApiReqParsers(object):
         _delete_task_list_parser.add_argument(
             name='id',
             required=True,
-            type=str,
+            type=int,
             location='json',
             help='ID of the Task List')
         _delete_task_list_parser.add_argument("delete_with_transfer", type=bool, required=True,

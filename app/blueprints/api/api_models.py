@@ -2,7 +2,7 @@ import flask_restx
 from flask_restx import fields
 
 
-def gen_api_models(api: flask_restx.Api):
+def gen_api_models(api):
     """
     Generate API Models for Flask-RESTX
     :@param api: Flask-RESTX API
@@ -38,8 +38,8 @@ def gen_api_models(api: flask_restx.Api):
                                                                     description='The task creation date'),
                                     'updated_at':   fields.DateTime(required=True, description='The task update date'),
                                     'task_list_id': fields.String(required=True, description='The task task list id'),
-                                    'id':           fields.String(required=True, description='The task id'), })
-    task_list_model = api.model('TaskList', {'id':          fields.String(required=True,
+                                    'id':           fields.Integer(required=True, description='The task id'), })
+    task_list_model = api.model('TaskList', {'id':          fields.Integer(required=True,
                                                                           description='The task list id'),
                                              'name':        fields.String(required=True,
                                                                           description='The task list name'),

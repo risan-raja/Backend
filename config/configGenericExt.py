@@ -1,22 +1,20 @@
 from dataclasses import dataclass
-from zxcvbn import zxcvbn
-from flask_security.utils import uia_email_mapper
 
-
-REDIS_URL = "redis://opla:ZnnfZ6EssaXW7Yq$@redis-19917.c240.us-east-1-3.ec2.cloud.redislabs.com:19917"
+REDIS_URL = "redis://default:passme@localhost:6379/5"
 
 
 @dataclass
 class FlaskExtConfig(object):
-
     CACHE_TYPE = "RedisCache"
-    CACHE_REDIS_URL = "redis://opla:ZnnfZ6EssaXW7Yq$@redis-19917.c240.us-east-1-3.ec2.cloud.redislabs.com:19917/0"
+    CACHE_REDIS_URL = "redis://default:passme@localhost:6379/1"
     CACHE_DEFAULT_TIMEOUT = 300
+    CACHE_KEY_PREFIX = "FCACHE_"
+
     SENTRY_DSN = "https://6c78492f0dbe4db4b230b93949916cdd@o4504245195898880.ingest.sentry.io/4504245201469443"
 
     CELERY_CONFIG = {
-        "broker_url": REDIS_URL,
-        "result_backend": REDIS_URL,
+            "broker_url":     REDIS_URL,
+            "result_backend": REDIS_URL,
     }
     CELERY_BROKER_URL = REDIS_URL
     CELERY_RESULT_BACKEND = REDIS_URL

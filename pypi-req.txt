@@ -1,0 +1,10 @@
+flask-mailman
+flask-shell-ipython
+hpy
+mypy-extensions
+pure-eval
+py-redis
+redis
+stack-data
+zxcvbn
+coolname
