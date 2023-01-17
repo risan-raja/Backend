@@ -5,14 +5,16 @@ from flask_security.utils import uia_email_mapper
 
 @dataclass
 class configSecurity(object):
-    SECURITY_PASSWORD_SALT = "65f639cff0ba3b459a800d6deaed666d56f7489697b275dded8ac5f83cf1e42d"
+    SECURITY_PASSWORD_SALT = (
+        "65f639cff0ba3b459a800d6deaed666d56f7489697b275dded8ac5f83cf1e42d"
+    )
     SECURITY_USERNAME_ENABLE = False
     SECURITY_FLASH_MESSAGES = False
 
     # Need to be able to route backend flask API calls. Use 'accounts'
     # to be the Flask-Security endpoints.
-    SECURITY_URL_PREFIX = '/api/accounts'
-    SECURITY_REDIRECT_HOST = '127.0.0.1'
+    SECURITY_URL_PREFIX = "/api/accounts"
+    SECURITY_REDIRECT_HOST = "127.0.0.1"
 
     # Turn on all the great Flask-Security features
     SECURITY_RECOVERABLE = True
@@ -23,12 +25,7 @@ class configSecurity(object):
     SECURITY_REGISTERABLE = True
     SECURITY_UNIFIED_SIGNIN = False
     SECURITY_USER_IDENTITY_ATTRIBUTES = [
-        {
-            "email": {
-                "mapper": uia_email_mapper,
-                "case_insensitive": True
-            }
-        },
+        {"email": {"mapper": uia_email_mapper, "case_insensitive": True}},
     ]
     # {"us_phone_number": {"mapper": uia_phone_mapper}},
     SECURITY_US_ENABLED_METHODS = ["password", "email"]
@@ -36,13 +33,13 @@ class configSecurity(object):
     SECURITY_PHONE_REGION_DEFAULT = "IN"
     SECURITY_PASSWORD_COMPLEXITY_CHECKER = zxcvbn
     SECURITY_PASSWORD_LENGTH_MIN = 8
-    SECURITY_EMAIL_VALIDATOR_ARGS = {'check_deliverability': True}
-    SECURITY_TOKEN_AUTHENTICATION_HEADER = 'Authentication-Token'
+    SECURITY_EMAIL_VALIDATOR_ARGS = {"check_deliverability": True}
+    SECURITY_TOKEN_AUTHENTICATION_HEADER = "Authentication-Token"
     """
     These need to be defined to handle redirects
     As defined in the API documentation - they will receive the relevant context
     """
-    #done
+    # done
     SECURITY_POST_LOGOUT_VIEW = "http://127.0.0.1/user-login"
     SECURITY_POST_CONFIRM_VIEW = "/confirmed"
     SECURITY_CONFIRM_ERROR_VIEW = "/confirm-error"
@@ -57,11 +54,10 @@ class configSecurity(object):
     """
     SECURITY_CSRF_PROTECT_MECHANISMS = ["session", "basic"]
     SECURITY_CSRF_IGNORE_UNAUTH_ENDPOINTS = True
-    
 
     # Send Cookie with csrf-token. This is the default for Axios and Angular.
     SECURITY_CSRF_COOKIE_NAME = "XSRF-TOKEN"
     WTF_CSRF_CHECK_DEFAULT = False
     WTF_CSRF_TIME_LIMIT = None
     SECURITY_TOTP_ISSUER = "None"
-    SECURITY_TOTP_SECRETS = {1: 'lSAG4uwH6Q9SQALv44bHgjKw4lp6RsGgVQaWIi1r4mh'}
+    SECURITY_TOTP_SECRETS = {1: "lSAG4uwH6Q9SQALv44bHgjKw4lp6RsGgVQaWIi1r4mh"}

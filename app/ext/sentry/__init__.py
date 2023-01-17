@@ -16,6 +16,7 @@ def init_sentry(app):
         environment="development",
         attach_stacktrace=True,
         _experiments={
-            "profiles_sample_rate": 1.0, },
+            "profiles_sample_rate": 1.0,
+        },
     )
     return sentry_sdk

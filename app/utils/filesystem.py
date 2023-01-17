@@ -35,13 +35,13 @@ def list_directories(directory, ignore=None):
     return list(
         filter(
             lambda x: os.path.isdir(os.path.join(directory, x)) and x not in ignore,
-            os.listdir(directory)
+            os.listdir(directory),
         )
     )
 
 
 def set_file(file_path, file_content):
-    with open(file_path, 'w') as f:
+    with open(file_path, "w") as f:
         f.write(file_content)
         f.close()
 
@@ -57,21 +57,23 @@ def copy_file(src, dest):
 
 
 def read_file(file_path):
-    return open(file_path, 'r')
+    return open(file_path, "r")
 
 
 def replace_templates_in_files(lookup_path, file_extension, template_vars, ignore=None):
     if not ignore:
         ignore = []
 
-    files = [f for f in glob.glob(lookup_path + "/**/*%s" % file_extension, recursive=True)]
+    files = [
+        f for f in glob.glob(lookup_path + "/**/*%s" % file_extension, recursive=True)
+    ]
 
     for f in files:
         if f.split("/")[-1] not in ignore:
-            file = open(f, 'r')
+            file = open(f, "r")
             file_content = Template(file.read()).substitute(template_vars)
             file.close()
 
-            file = open(f, 'w')
+            file = open(f, "w")
             file.write(file_content)
             file.close()

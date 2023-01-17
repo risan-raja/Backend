@@ -13,15 +13,21 @@ user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 
 
 class ExtendedRegisterForm(RegisterForm):
-    first_name = StringField('First Name',
-                             [DataRequired(message="Invalid First Name : Please provide a valid First Name")])
-    last_name = StringField('Last Name', [Optional()])
+    first_name = StringField(
+        "First Name",
+        [
+            DataRequired(
+                message="Invalid First Name : Please provide a valid First Name"
+            )
+        ],
+    )
+    last_name = StringField("Last Name", [Optional()])
 
 
-@celery.task(name='security.send_email')
+@celery.task(name="security.send_email")
 def send_flask_mail(**kwargs):
     with current_app.app_context():
-        with current_app.extensions['mailman'].get_connection() as connection:
+        with current_app.extensions["mailman"].get_connection() as connection:
             html = kwargs.pop("html", None)
             msg = EmailMultiAlternatives(connection=connection, **kwargs)
             if html:
@@ -30,13 +36,17 @@ def send_flask_mail(**kwargs):
 
 
 class MyMailUtil(MailUtil):
-    def send_mail(self, template, subject, recipient, sender, body, html, user, **kwargs):
-        return send_flask_mail.apply_async(kwargs={
-                "subject":    subject,
+    def send_mail(
+        self, template, subject, recipient, sender, body, html, user, **kwargs
+    ):
+        return send_flask_mail.apply_async(
+            kwargs={
+                "subject": subject,
                 "from_email": sender,
-                "to":         [recipient],
-                "body":       body + "this is by celery",
-                "html":       html, }
+                "to": [recipient],
+                "body": body + "this is by celery",
+                "html": html,
+            }
         )
 
 

@@ -12,6 +12,7 @@ class GUID(TypeDecorator):
     Uses PostgreSQL's UUID type, otherwise uses
     CHAR(32), storing as stringified hex values.
     """
+
     impl = CHAR
     cache_ok = True
 

@@ -1,4 +1,5 @@
 import uuid
+
 # from datetime import datetime
 from datetime import datetime
 from datetime import timedelta
@@ -13,24 +14,16 @@ class Task(Base):
     title = db.Column(db.Text, unique=False, nullable=False)
     content = db.Column(db.Text, unique=False, nullable=True)
     deadline = db.Column(
-        db.DateTime,
-        nullable=False,
-        default=datetime.utcnow() + timedelta(days=1)
+        db.DateTime, nullable=False, default=datetime.utcnow() + timedelta(days=1)
     )
     completed = db.Column(db.Boolean, nullable=False, default=False)
-    task_list_id = db.Column(db.Integer,
-                             db.ForeignKey('task_list.id'),
-                             nullable=True)
-    created_at = db.Column(db.DateTime,
-                           nullable=False,
-                           default=datetime.utcnow())
-    updated_at = db.Column(db.DateTime,
-                           nullable=False,
-                           default=datetime.utcnow())
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    task_list_id = db.Column(db.Integer, db.ForeignKey("task_list.id"), nullable=True)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow())
+    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow())
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True)
     order = db.Column(db.Integer, nullable=True)
-    user = db.relationship('User', back_populates='tasks')
-    task_list = db.relationship('TaskList', back_populates='tasks')
+    user = db.relationship("User", back_populates="tasks")
+    task_list = db.relationship("TaskList", back_populates="tasks")
 
     def __repr__(self):
-        return '<Task %r>' % self.title
+        return "<Task %r>" % self.title

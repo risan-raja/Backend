@@ -4,12 +4,11 @@ from flask_mailman import Mail
 from config import Config
 
 mail = Mail()
-celery = Celery(__name__, broker=Config.CELERY_BROKER_URL,
-                backend=Config.CELERY_RESULT_BACKEND
-                )
+celery = Celery(
+    __name__, broker=Config.CELERY_CONFIG['broker_url'], backend=Config.CELERY_CONFIG['result_backend']
+)
 
 
-# appmap = AppmapFlask()
-@celery.task(name='add_this')
+@celery.task(name="add_this")
 def add(x, y):
     return x + y

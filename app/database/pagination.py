@@ -39,14 +39,16 @@ class Pagination(object):
 
     def prev(self, error_out=False):
         """Returns a `Pagination` object for the previous page."""
-        assert self.query is not None, \
-            'a query object is required for this method to work'
+        assert (
+            self.query is not None
+        ), "a query object is required for this method to work"
 
         return self.query.paginate(self.page - 1, self.per_page, error_out)
 
     def next(self, error_out=False):
         """Returns a `Pagination` object for the next page."""
-        assert self.query is not None, \
-            'a query object is required for this method to work'
+        assert (
+            self.query is not None
+        ), "a query object is required for this method to work"
 
         return self.query.paginate(self.page + 1, self.per_page, error_out)

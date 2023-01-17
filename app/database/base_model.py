@@ -7,11 +7,7 @@ from app.utils import camel_to_snake
 
 def id_column():
     return Column(
-        INTEGER,
-        autoincrement=True,
-        primary_key=True,
-        nullable=False,
-        unique=True
+        INTEGER, autoincrement=True, primary_key=True, nullable=False, unique=True
     )
 
 
@@ -60,7 +56,7 @@ class _BaseModel(object):
 
     @declared_attr
     def __tablename__(cls):
-        return camel_to_snake(cls.__name__).replace('_model', '')
+        return camel_to_snake(cls.__name__).replace("_model", "")
 
 
 BaseModel = declarative_base(cls=_BaseModel)

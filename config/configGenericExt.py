@@ -16,11 +16,12 @@ class FlaskExtConfig(object):
             "broker_url":     REDIS_URL,
             "result_backend": REDIS_URL,
     }
-    CELERY_BROKER_URL = REDIS_URL
-    CELERY_RESULT_BACKEND = REDIS_URL
+    # CELERY_BROKER_URL = REDIS_URL
+    # CELERY_RESULT_BACKEND = REDIS_URL
 
     accept_content = ["json"]
     task_serializer = "json"
+    enable_utc = True
     result_serializer = "json"
 
     MAIL_SERVER = "smtp-mail.outlook.com"

@@ -9,14 +9,14 @@ from . import Base
 
 
 class RolesUsers(Base):
-    __tablename__ = 'roles_users'
+    __tablename__ = "roles_users"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column('user_id', db.Integer, db.ForeignKey('user.id'))
-    role_id = db.Column('role_id', db.Integer, db.ForeignKey('role.id'))
+    user_id = db.Column("user_id", db.Integer, db.ForeignKey("user.id"))
+    role_id = db.Column("role_id", db.Integer, db.ForeignKey("role.id"))
 
 
 class Role(Base, RoleMixin):
-    __tablename__ = 'role'
+    __tablename__ = "role"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(80), unique=True)
     description = db.Column(db.String(255))
@@ -24,7 +24,7 @@ class Role(Base, RoleMixin):
 
 
 class User(Base, UserMixin):
-    __tablename__ = 'user'
+    __tablename__ = "user"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     # id = db.Column(GUID, primary_key=True, default=uuid.uuid4)
     first_name = db.Column(db.String(255), nullable=False)
@@ -36,18 +36,20 @@ class User(Base, UserMixin):
     login_count = db.Column(db.Integer)
     active = db.Column(db.Boolean, default=True)
     fs_uniquifier = db.Column(db.String(255), unique=True, nullable=False)
-    roles = db.relationship('Role',
-                            secondary='roles_users',
-                            backref=db.backref('user', lazy='dynamic'))
-    task_lists = db.relationship('TaskList', back_populates='user', lazy="selectin",
-                                 cascade='all,delete',
-                                 order_by='TaskList.list_order',
-                                 collection_class=ordering_list('list_order', count_from=0))
-    tasks = db.relationship('Task', back_populates='user', lazy="selectin")
+    roles = db.relationship(
+        "Role", secondary="roles_users", backref=db.backref("user", lazy="dynamic")
+    )
+    task_lists = db.relationship(
+        "TaskList",
+        back_populates="user",
+        lazy="selectin",
+        cascade="all,delete",
+        order_by="TaskList.list_order",
+        collection_class=ordering_list("list_order", count_from=0),
+    )
+    tasks = db.relationship("Task", back_populates="user", lazy="selectin")
 
-    created_at = db.Column(db.DateTime,
-                           nullable=False,
-                           default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     current_login_ip = db.Column(db.String(100))
     last_login_ip = db.Column(db.String(100))
     confirmed_at = db.Column(db.DateTime())
@@ -55,12 +57,13 @@ class User(Base, UserMixin):
 
     def get_security_payload(self):
         return {
-                'email':        self.email,
-                'first_name':   self.first_name,
-                'last_name':    self.last_name,
-                'active':       self.active,
-                'confirmed_at': self.confirmed_at,
+            "email": self.email,
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "active": self.active,
+            "confirmed_at": self.confirmed_at,
         }
+
 
 # class Preferences(Base):
 #     __tablename__ = 'preferences'

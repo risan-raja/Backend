@@ -13,11 +13,11 @@
         </library>
       </libraries>
     </data-source>
-    <data-source source="LOCAL" name="Redis" uuid="bd341302-db9d-4cfc-98fd-1216c2a3260e">
+    <data-source source="LOCAL" name="@localhost" uuid="bd341302-db9d-4cfc-98fd-1216c2a3260e">
       <driver-ref>redis</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>jdbc.RedisDriver</jdbc-driver>
-      <jdbc-url>jdbc:redis://redis-19917.c240.us-east-1-3.ec2.cloud.redislabs.com:19917</jdbc-url>
+      <jdbc-url>jdbc:redis://localhost:6379</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
     <data-source source="LOCAL" name="identifier.sqlite" uuid="ef6ffc94-9c81-4f68-871e-4799c6730017">

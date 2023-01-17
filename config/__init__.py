@@ -1,8 +1,9 @@
-from .configDB import configDB
+from .ConfigDB import ConfigDB
 from .configGeneric import AppBaseConfig
-from .configSecurity import configSecurity
 from .configGenericExt import FlaskExtConfig
+from .configSecurity import configSecurity
+from .envDevelop import DevelopmentConfig
 
 
-class Config(AppBaseConfig, configDB, configSecurity, FlaskExtConfig):
+class Config(AppBaseConfig, ConfigDB, configSecurity, FlaskExtConfig, DevelopmentConfig):
     pass

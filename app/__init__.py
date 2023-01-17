@@ -25,19 +25,27 @@ def create_app():
     cors.init_app(
         app,
         resources={
-                r'/*': {
-                        'origins':
-                            ['0.0.0.0', 'localhost', '192.168.29.74', '192.168.29.65', '127.0.0.1']
-                }
-        })
+            r"/*": {
+                "origins": [
+                    "0.0.0.0",
+                    "localhost",
+                    "192.168.29.74",
+                    "192.168.29.65",
+                    "127.0.0.1",
+                ]
+            }
+        },
+    )
     # init_sentry(app)
     cache.init_app(app)
     # DebugToolbarExtension(app)
     flask_wtf.CSRFProtect(app)
-    security.init_app(app,
-                      datastore=user_datastore,
-                      confirm_register_form=ExtendedRegisterForm,
-                      mail_util_cls=MyMailUtil)
+    security.init_app(
+        app,
+        datastore=user_datastore,
+        confirm_register_form=ExtendedRegisterForm,
+        mail_util_cls=MyMailUtil,
+    )
     celery.conf.update(app.config)
     app.register_blueprint(api_bp)
 

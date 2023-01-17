@@ -1,8 +1,5 @@
-import uuid
 from datetime import datetime
-from gevent import monkey
-monkey.patch_all()
-from flask import Blueprint, jsonify
+from flask import Blueprint
 from flask import current_app
 from flask import request
 from flask_restx import Api, Resource
@@ -20,7 +17,7 @@ def convert_string_to_datetime(date):
 
 
 authorizations = {
-        "apikey": {"type": "apiKey", "in": "header", "name": "Authentication-Token"}
+    "apikey": {"type": "apiKey", "in": "header", "name": "Authentication-Token"}
 }
 api_bp = Blueprint("api", __name__, url_prefix="/api/kanban")
 api = Api(
@@ -62,7 +59,6 @@ req_parsers = ApiReqParsers()
 
 @api.route("/user/task_lists")
 class TaskListApi(Resource):
-
     @auth_token_required
     @api.expect(req_parsers.create_task_list_parser)
     def post(self):
@@ -95,7 +91,6 @@ class TaskListApi(Resource):
         user_id = current_user.id
         args = req_parsers.edit_task_list_parser.parse_args()
         task_list_id = args["task_list_id"]
-        # task_list = TaskList.query.filter_by(id=task_list_id).first()
         task_list = TaskList.query.get(task_list_id)
         task_list.name = args["name"]
         task_list.description = args["description"]
@@ -129,26 +124,21 @@ def get_task(task_id):
     return t
 
 
-from .dfs import DATA
-
-
 @api.route("/user/tasks/<task_id>")
 class GTask(Resource):
     # @auth_token_required
     # @api.marshal_with(task_model)
-    # @cache.cached(timeout=1)
     # @auth_token_required
+    @cache.cached(timeout=3)
     def get(self, task_id: str):
         task_id = task_id
         e = Task.query.all()
         t = TaskList.query.all()
         return "Task.query.get(task_id)"
-        # return get_task(task_id)
 
 
 @api.route("/user/tasks")
 class TaskApi(Resource):
-
     @auth_token_required
     @api.expect(req_parsers.create_task_parser)
     def post(self, task_list_id):

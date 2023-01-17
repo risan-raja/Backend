@@ -7,16 +7,17 @@ from config import Config
 from .base_model import BaseModel as Base
 
 db_engine = create_engine(
-    Config.SQLALCHEMY_DATABASE_URI,
-    echo=Config.SQLALCHEMY_ENGINE_ECHO
+    Config.SQLALCHEMY_DATABASE_URI, echo=Config.SQLALCHEMY_ENGINE_ECHO
 )
 # create empty session for future usage
 db_session = scoped_session(sessionmaker(autocommit=False, autoflush=False))
 
 # user_datastore = SQLAlchemySessionUserDatastore(db_session, User, Role)
-db = SQLAlchemy(session_options={"autocommit": False, "autoflush": False},
-                model_class=Base,
-                query_class=BaseQuery, )
+db = SQLAlchemy(
+    session_options={"autocommit": False, "autoflush": False},
+    model_class=Base,
+    query_class=BaseQuery,
+)
 
 
 def init_db(app):
@@ -42,7 +43,7 @@ def init_db(app):
         bind=engine,
         autocommit=app.config.get("SQLALCHEMY_AUTOCOMMIT"),
         autoflush=app.config.get("SQLALCHEMY_AUTOFLUSH"),
-        query_cls=BaseQuery
+        query_cls=BaseQuery,
     )
     db.init_app(app)
 
