@@ -3,7 +3,7 @@ from flask import Flask
 from sentry_sdk.integrations.flask import FlaskIntegration
 
 
-def init_sentry(app: Flask):
+def init_sentry(app):
     sentry_sdk.init(
         dsn=app.config.get("SENTRY_DSN"),
         # Set tracesSampleRate to 1.0 to capture 100%

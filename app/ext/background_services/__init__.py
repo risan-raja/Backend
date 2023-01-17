@@ -9,6 +9,7 @@ celery = Celery(__name__, broker=Config.CELERY_BROKER_URL,
                 )
 
 
+# appmap = AppmapFlask()
 @celery.task(name='add_this')
 def add(x, y):
     return x + y
