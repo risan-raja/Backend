@@ -1,10 +1,30 @@
  * Serving Flask app 'wsgi:app'
- * Debug mode: off
+ * Debug mode: on
 WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
- * Running on http://127.0.0.1:5000
+ * Running on http://127.0.0.1:8000
 Press CTRL+C to quit
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 438-185-364
+Exception ignored from cffi callback <bound method _Callbacks.python_check_callback of <gevent.libev.corecffi._Callbacks object at 0x00007fd83e9cdb78>>:
 Traceback (most recent call last):
   File "/home/mlop3n/Programs/intel/oneapi/intelpython/latest/envs/webpypy/lib/pypy3.9/site-packages/gevent/libev/corecffi.py", line 65, in python_check_callback
     _loop, watcher_ptr, _events = args
 KeyboardInterrupt
-2023-01-17T06:40:23Z
+2023-01-17T10:48:19Z
+Traceback (most recent call last):
+  File "/home/mlop3n/Programs/intel/oneapi/intelpython/latest/envs/webpypy/lib/pypy3.9/site-packages/coverage/pytracer.py", line 115, in _trace
+    if THIS_FILE in frame.f_code.co_filename:
+KeyboardInterrupt
+Exception ignored in:
+During the call to 'onerror', another exception occurred:
+
+:
+Traceback (most recent call last):
+  File "/home/mlop3n/Programs/intel/oneapi/intelpython/latest/envs/webpypy/lib/pypy3.9/site-packages/gevent/_ffi/loop.py", line 305, in check_callback_onerror
+    watcher_ptr = self._find_watcher_ptr_in_traceback(tb)
+  File "/home/mlop3n/Programs/intel/oneapi/intelpython/latest/envs/webpypy/lib/pypy3.9/site-packages/gevent/libev/corecffi.py", line 75, in _find_watcher_ptr_in_traceback
+    return AbstractCallbacks._find_watcher_ptr_in_traceback(self, tb)
+  File "/home/mlop3n/Programs/intel/oneapi/intelpython/latest/envs/webpypy/lib/pypy3.9/site-packages/gevent/_ffi/loop.py", line 319, in _find_watcher_ptr_in_traceback
+    return tb.tb_frame.f_locals['watcher_ptr'] if tb is not None else None
+KeyError: 'watcher_ptr'

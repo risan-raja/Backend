@@ -1,11 +1,10 @@
 import flask_wtf
 from flask import Flask
 from flask_migrate import Migrate
-
 from app.blueprints.api import api_bp
 from app.database import db
 from app.database.database import init_db
-from app.ext.background_services import celery, mail
+from app.ext.background_services import celery, mail, make_celery
 from app.ext.cache import cache
 from app.ext.cors import cors
 from app.ext.security import ExtendedRegisterForm, MyMailUtil, security, user_datastore
@@ -46,7 +45,8 @@ def create_app():
         confirm_register_form=ExtendedRegisterForm,
         mail_util_cls=MyMailUtil,
     )
-    celery.conf.update(app.config)
+    # celery.conf.update(app.config)
+    celery = make_celery(app)
     app.register_blueprint(api_bp)
 
     return app

@@ -13,8 +13,8 @@ class FlaskExtConfig(object):
     SENTRY_DSN = "https://6c78492f0dbe4db4b230b93949916cdd@o4504245195898880.ingest.sentry.io/4504245201469443"
 
     CELERY_CONFIG = {
-            "broker_url":     REDIS_URL,
-            "result_backend": REDIS_URL,
+        "broker_url": REDIS_URL,
+        "result_backend": REDIS_URL,
     }
     # CELERY_BROKER_URL = REDIS_URL
     # CELERY_RESULT_BACKEND = REDIS_URL

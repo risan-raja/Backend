@@ -1,13 +1,20 @@
-# ./flask_app/pywsgi.py
-from gevent import monkey
+import warnings
+#
+warnings.filterwarnings("ignore")
 
-monkey.patch_all()
 
-from wsgi import app
-
+from coolname import generate_slug
+from app import create_app
+from app.database import db
+from app.models import *
+app = create_app()
 app.app_context().push()
-if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=8000, threaded=True, load_dotenv=True)
 
+u = User.query.all()[0]
+for e in range(10):
+    ts = TaskList(name=generate_slug(2), description=generate_slug(2), user_id=u.id)
 
-# gunicorn --worker-class gevent 9 --threads 2 wsgi:app --bind 0.0.0.0:8000 --preload --reload &
+    # print("Current TaskList.list_order : ", ts.list_order)
+    db.session.add(ts)
+    print(TaskList.get_total_task_lists(u.id))
+    # db.session.commit()

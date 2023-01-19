@@ -37,7 +37,7 @@ def init_db(app):
     @event.listens_for(engine, "begin")
     def do_begin(conn):
         # emit our own BEGIN
-        conn.exec_driver_sql("BEGIN IMMEDIATE")
+        conn.exec_driver_sql("BEGIN EXCLUSIVE")
 
     db_session.configure(
         bind=engine,
