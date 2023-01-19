@@ -37,13 +37,7 @@ class TaskList(Base):
     )
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow())
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow())
-
     list_order = db.Column(db.Integer, nullable=True, default=0)
-
-    # @property
-    # def list_order(self):
-    #     return self.user.task_lists.index(self)
-    # TaskList.get_total_task_lists()
 
     def __repr__(self):
         return "<List %r>" % self.name

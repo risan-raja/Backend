@@ -13,25 +13,39 @@ def hit():
 
 # @shared_task(name="create_task_lists")
 @celery.task(name="create_task_lists")
-def create_task_lists(user_id, N):
+def create_task_lists(user_id, n):
     # from flask import current_app
     # from app.models import TaskList
     with app.app_context():
         # n_ts = []
 
-        # for i in range(N):
-        task_list_name = generate_slug(4)
-        task_list_description = generate_slug(4)
-        ts = TaskList(name=task_list_name,
-                    description=task_list_description,
-                        user_id=user_id)
+        for i in range(n):
+            task_list_name = generate_slug(4)
+            task_list_description = generate_slug(4)
+            ts = TaskList(name=task_list_name,
+                          description=task_list_description,
+                          user_id=user_id)
             # n_ts.append(ts)
-        # db.session.add_all(n_ts)
-        db.session.add(ts)
-        db.session.commit()
-        return "done"
+            # db.session.add_all(n_ts)
+            db.session.add(ts)
+            db.session.commit()
+            return "done"
 
 
 @celery.task(name="add_this")
 def add(x, y):
     return x + y
+
+
+@celery.task(name="ReOrderTaskListAfterUpdate")
+def task_list_reorder(user_id, task_list_id):
+    with app.app_context():
+        db.session.commit()
+        return "done"
+
+
+@celery.task(name="ReOrderTasksAfterUpdate")
+def task_list_reorder(task_list_id, task_id):
+    with app.app_context():
+        db.session.commit()
+        return "done"
